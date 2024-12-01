@@ -1,0 +1,44 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
+
+PROJECT(tls-server)
+
+FILE(
+    GLOB
+    files
+    *.c
+    *.h
+)
+
+ADD_EXECUTABLE(
+    ${PROJECT_NAME}
+    ${files}
+)
+
+ADD_SUBDIRECTORY(
+    ${CMAKE_SOURCE_DIR}/port/openssl
+    ${CMAKE_SOURCE_DIR}/build/port/openssl
+)
+
+ADD_SUBDIRECTORY(
+    ${CMAKE_SOURCE_DIR}/port/se052f
+    ${CMAKE_SOURCE_DIR}/build/port/se052f
+)
+
+TARGET_INCLUDE_DIRECTORIES(
+    ${PROJECT_NAME}
+    PRIVATE
+    ${CMAKE_SOURCE_DIR}
+)
+
+TARGET_LINK_LIBRARIES(
+    ${PROJECT_NAME}
+    PRIVATE
+    openssl
+    se052f
+)
+
+SET_TARGET_PROPERTIES(
+    ${PROJECT_NAME}
+    PROPERTIES RUNTIME_OUTPUT_DIRECTORY
+    ${PROJECT_SOURCE_DIR}/bin
+)
