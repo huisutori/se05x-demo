@@ -1,0 +1,3 @@
+[submodule "se05x-middleware"]
+	path = se05x-middleware
+	url = your-local-directory-path
