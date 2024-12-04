@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "fsl_sss_se05x_apis.h"
 #include "fsl_sss_openssl_apis.h"
 #include "nxScp03_Types.h"
@@ -33,58 +32,58 @@ static NXSCP03_StaticCtx_t platform_scp_key = {
 
 static int setup_host(void)
 {
-    int err = sss_host_session_open(&host_session, kType_SSS_OpenSSL, 0, 
+    int status = sss_host_session_open(&host_session, kType_SSS_OpenSSL, 0, 
                                     kSSS_ConnectionType_Plain, NULL);
-    if (err) {
+    if (status != kStatus_SSS_Success) {
         return -1;
     }
 
-    err = sss_host_key_store_context_init(&platform_scp_keystore, &host_session);
-    if (err) {
+    status = sss_host_key_store_context_init(&platform_scp_keystore, &host_session);
+    if (status != kStatus_SSS_Success) {
         return -2;
     }
 
-    err = sss_host_key_store_allocate(&platform_scp_keystore, PLATFORM_SCP_KEYSTORE_ID);
-    if (err) {
+    status = sss_host_key_store_allocate(&platform_scp_keystore, PLATFORM_SCP_KEYSTORE_ID);
+    if (status != kStatus_SSS_Success) {
         return -3;
     }
 
-    err = sss_host_key_object_init(&platform_scp_key.Enc, &platform_scp_keystore);
-    if (err) {
+    status = sss_host_key_object_init(&platform_scp_key.Enc, &platform_scp_keystore);
+    if (status != kStatus_SSS_Success) {
         return -4;
     }
 
-    err = sss_host_key_object_allocate_handle(&platform_scp_key.Enc, PLATFORM_SCP_ENC_KEY_ID,
+    status = sss_host_key_object_allocate_handle(&platform_scp_key.Enc, PLATFORM_SCP_ENC_KEY_ID,
                                               kSSS_KeyPart_Default, kSSS_CipherType_AES,
                                               PLATFORM_SCP_KEY_SIZE, kKeyObject_Mode_Transient);
-    if (err) {
+    if (status != kStatus_SSS_Success) {
         return -5;
     }
 
-    err = sss_host_key_store_set_key(&platform_scp_keystore, &platform_scp_key.Enc, 
+    status = sss_host_key_store_set_key(&platform_scp_keystore, &platform_scp_key.Enc, 
                                      platform_scp_enc_key, PLATFORM_SCP_KEY_SIZE, 
                                      PLATFORM_SCP_KEY_SIZE * 8, NULL, 0);
-    if (err) {
+    if (status != kStatus_SSS_Success) {
         return -6;
     }
 
-    err = sss_host_key_object_init(&platform_scp_key.Mac, &platform_scp_keystore);
-    if (err) {
+    status = sss_host_key_object_init(&platform_scp_key.Mac, &platform_scp_keystore);
+    if (status != kStatus_SSS_Success) {
         return -7;
     }
 
-    err = sss_host_key_object_allocate_handle(&platform_scp_key.Mac, PLATFORM_SCP_MAC_KEY_ID,
+    status = sss_host_key_object_allocate_handle(&platform_scp_key.Mac, PLATFORM_SCP_MAC_KEY_ID,
                                               kSSS_KeyPart_Default, kSSS_CipherType_AES,
                                               PLATFORM_SCP_KEY_SIZE, kKeyObject_Mode_Transient);
 
-    if (err) {
+    if (status != kStatus_SSS_Success) {
         return -8;
     }
 
-    err = sss_host_key_store_set_key(&platform_scp_keystore, &platform_scp_key.Mac, 
+    status = sss_host_key_store_set_key(&platform_scp_keystore, &platform_scp_key.Mac, 
                                      platform_scp_mac_key, PLATFORM_SCP_KEY_SIZE, 
                                      PLATFORM_SCP_KEY_SIZE * 8, NULL, 0);
-    if (err) {
+    if (status != kStatus_SSS_Success) {
         return -9;
     }
 
@@ -100,9 +99,9 @@ static int setup_se(void)
         .auth.ctx.scp03.pStatic_ctx = &platform_scp_key,
     };
 
-    int err = sss_session_open(&se_session, kType_SSS_SE_SE05x, 0, 
+    int status = sss_session_open(&se_session, kType_SSS_SE_SE05x, 0, 
                                kSSS_ConnectionType_Encrypted, &connection_context);
-    if (err) {
+    if (status != kStatus_SSS_Success) {
         return -1;
     }
 
@@ -116,7 +115,6 @@ int SecureElement_init(void)
 
     int err = setup_host();
     if (err) {
-	printf("setup_host() error: %d\n", err);
         return -1;
     }
 
